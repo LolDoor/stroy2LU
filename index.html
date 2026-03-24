@@ -122,7 +122,6 @@
         }
     </style>
 </head>
-<body>
     <!-- Логотип сервера -->
     <div class="logo">STROY2</div>
 
@@ -134,5 +133,24 @@
         <div class="spinner"></div>
         <div class="spinner-label">Загрузка ресурсов...</div>
     </div>
+    <!-- 🔊 Фоновая музыка (зацикленная) -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="https://loldoor.github.io/stroy2LU/Muzon.mp3" type="audio/mpeg">
+  Ваш браузер не поддерживает аудио-элемент.
+</audio>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const audio = document.getElementById('bgMusic');
+    audio.volume = 0.35; // Громкость: 0.0 (тихо) — 1.0 (громко)
+    
+    // Пытаемся запустить автоматически
+    audio.play().catch(function(error) {
+      console.log('Autoplay заблокирован браузером:', error);
+      // Это нормально — многие браузеры блокируют звук без клика
+      // Если нужно, можем добавить кнопку включения
+    });
+  });
+</script>
 </body>
 </html>
