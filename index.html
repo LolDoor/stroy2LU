@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STROY REZERV - Загрузка сервера</title>
+    <title>STROY2 - Загрузка сервера</title>
     <style>
         * {
             margin: 0;
@@ -23,6 +23,46 @@
             align-items: center;
             color: white;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* 🎬 Видео-интро на весь экран */
+        #introVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 100;
+            background: #000;
+            transition: opacity 0.3s ease-out;
+        }
+
+        /* Затемнение после видео */
+        #fadeOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in;
+        }
+
+        /* Основной контент (скрыт изначально) */
+        #mainContent {
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             position: relative;
         }
 
@@ -109,7 +149,7 @@
             border-radius: 1px;
         }
 
-        /* Адаптивность для разных разрешений */
+        /* Адаптивность */
         @media (max-width: 1280px) {
             .logo { font-size: 1.8rem; }
             .loading-text { font-size: 1.5rem; }
@@ -123,35 +163,75 @@
     </style>
 </head>
 <body>
-    <!-- Логотип сервера -->
-    <div class="logo">STROY REZERV</div>
+    <!-- 🎬 Видео-интро -->
+    <video id="introVideo" preload="auto" playsinline muted>
+        <source src="https://loldoor.github.io/stroy2LU/0327.mp4" type="video/mp4">
+    </video>
 
-    <!-- Основной текст загрузки -->
-    <div class="loading-text">Подождите, идёт загрузка сервера</div>
+    <!-- 🌑 Затемнение между видео и основным экраном -->
+    <div id="fadeOverlay"></div>
 
-    <!-- Спиннер загрузки -->
-    <div class="spinner-container">
-        <div class="spinner"></div>
-        <div class="spinner-label">Загрузка ресурсов...</div>
+    <!-- 📦 Основной контент (появится после видео) -->
+    <div id="mainContent">
+        <!-- Логотип сервера -->
+        <div class="logo">STROY2</div>
+
+        <!-- Основной текст загрузки -->
+        <div class="loading-text">Подождите, идёт загрузка сервера</div>
+
+        <!-- Спиннер загрузки -->
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="spinner-label">Загрузка ресурсов...</div>
+        </div>
     </div>
-	<!-- 🔊 Фоновая музыка (зацикленная) -->
-<audio id="bgMusic" loop preload="auto">
-  <source src="https://loldoor.github.io/stroy2LU/Muzon.mp3" type="audio/mpeg">
-  Ваш браузер не поддерживает аудио-элемент.
-</audio>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const audio = document.getElementById('bgMusic');
-    audio.volume = 0.35; // Громкость: 0.0 (тихо) — 1.0 (громко)
-    
-    // Пытаемся запустить автоматически
-    audio.play().catch(function(error) {
-      console.log('Autoplay заблокирован браузером:', error);
-      // Это нормально — многие браузеры блокируют звук без клика
-      // Если нужно, можем добавить кнопку включения
-    });
-  });
-</script>
+    <!-- 🔊 Фоновая музыка (зацикленная, играет ВСЕГДА) -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://loldoor.github.io/stroy2LU/Muzon.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио-элемент.
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('introVideo');
+            const overlay = document.getElementById('fadeOverlay');
+            const mainContent = document.getElementById('mainContent');
+            const audio = document.getElementById('bgMusic');
+            
+            // 🎵 Запускаем музыку сразу
+            audio.volume = 0.35;
+            audio.play().catch(e => console.log('Autoplay audio:', e));
+
+            // 🎬 Запускаем видео
+            video.play().catch(e => console.log('Autoplay video:', e));
+
+            // ⏱️ Когда видео заканчивается:
+            video.addEventListener('ended', function() {
+                // 1. Резко затемняем экран
+                overlay.style.opacity = '1';
+                
+                // 2. Плавно скрываем видео
+                video.style.opacity = '0';
+                
+                // 3. Ждём ~1 секунду, затем показываем основной контент
+                setTimeout(function() {
+                    // Убираем затемнение
+                    overlay.style.opacity = '0';
+                    
+                    // Показываем основной контент за 0.5 сек
+                    mainContent.style.opacity = '1';
+                    
+                    // Видео больше не нужно — удаляем из DOM
+                    setTimeout(() => {
+                        if (video.parentNode) {
+                            video.parentNode.removeChild(video);
+                        }
+                    }, 500);
+                    
+                }, 1000);
+            });
+        });
+    </script>
 </body>
 </html>
